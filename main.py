@@ -30,14 +30,14 @@ where person.averagescore > 5 and music.effects = 'Improve'
 '''
 
 view_1 = '''
-create or replace view view_hours_depression as
+create or replace view deperssion_and_hours_per_day as
 select hours_per_day, depression
 from person
 join mental_illness on person.averagescore = mental_illness.averagescore
 order by hours_per_day;
 '''
 view_2 = '''
-create or replace view view_fav_genres_ocd_lt_5 as
+create or replace view genres_of_ocd_less_than_5 as
 select fav_genre, ocd
 from person
 join mental_illness on person.averagescore = mental_illness.averagescore
@@ -45,7 +45,7 @@ join music on person.music_id = music.music_id
 where mental_illness.ocd < 5;
 '''
 view_3 = '''
-create or replace view view_fav_genres_bpm_improve as
+create or replace view genres_and_bpm_that_improve_mental_state as
 select fav_genre, bpm
 from person
 join mental_illness on person.averagescore = mental_illness.averagescore
@@ -67,7 +67,7 @@ with conn:
     cur.execute(view_3)
 
     # Розріз 1. Вивести кількість годин прослуховування на день та рівень депресії
-    cur.execute("SELECT * FROM view_hours_depression")
+    cur.execute("SELECT * FROM deperssion_and_hours_per_day")
     hours_per_day, depression = zip(*cur.fetchall())
 
     plt.bar(hours_per_day, depression, width=0.3)
@@ -78,7 +78,7 @@ with conn:
     plt.show()
 
     # Розріз 2. Вивести улюблені жанри тих, у кого рівень тривоги менше 5
-    cur.execute("SELECT * FROM view_fav_genres_ocd_lt_5")
+    cur.execute("SELECT * FROM genres_of_ocd_less_than_5")
     fav_genres, ocd_values = zip(*cur.fetchall())
 
     genre_counts = {}
@@ -95,7 +95,7 @@ with conn:
 
 
     # Розріз 3. Вивести жанри та bpm музики для людей з середнім рівнем психічних захворювань більше 5, яким музика покращує психічний стан
-    cur.execute("SELECT * FROM view_fav_genres_bpm_improve")
+    cur.execute("SELECT * FROM genres_and_bpm_that_improve_mental_state")
     fav_genres, bpm_values = zip(*cur.fetchall())
 
     plt.scatter(fav_genres, bpm_values)  
@@ -104,4 +104,4 @@ with conn:
     plt.title('Жанри та bpm музики для людей з середнім рівнем психічних захворювань більше 5, яким музика покращує психічний стан')
     plt.show()
 
-    conn.close()
+conn.close()
