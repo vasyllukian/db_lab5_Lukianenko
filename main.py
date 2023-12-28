@@ -3,31 +3,10 @@ import matplotlib.pyplot as plt
 
 username = 'postgres'
 password = 'postgres'
-database = 'db_lab3_lukianenko'
+database = 'db_lab5_lukianenko'
 host = 'localhost'
 port = '5432'
 
-query_1 = '''
-select hours_per_day, depression 
-from person 
-join mental_illness on person.averagescore = mental_illness.averagescore
-order by hours_per_day
-'''
-query_2 = '''
-select fav_genre, ocd
-from person
-join mental_illness on person.averageScore = mental_illness.averageScore
-join music on person.music_id = music.music_id
-where mental_illness.ocd < 5
-'''
-
-query_3 = '''
-select fav_genre, bpm
-from person 
-join mental_illness on person.averagescore = mental_illness.averagescore
-join music on person.music_id = music.music_id
-where person.averagescore > 5 and music.effects = 'Improve'
-'''
 
 view_1 = '''
 create or replace view deperssion_and_hours_per_day as
