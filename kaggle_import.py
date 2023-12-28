@@ -11,7 +11,9 @@ conn = psycopg2.connect(user=username, password=password, dbname=database, host=
 print(type(conn))
 
 csv_file_path = r'D:\the work\the work\sem 5\data base\mxmh_survey_results.csv'
+
 current_music_id = 9
+current_mental_illness_id = 9
 
 with conn:
     print("Database opened successfully")
@@ -21,8 +23,8 @@ with conn:
         counter = 0
 
         csvreader = csv.DictReader(csvfile)
-        # пропускаємо перші 9 рядків оскільки вони вже додавались в третій лабораторній
-        for _ in range(9):
+        # пропускаємо перші 18 рядків оскільки вони вже додавались в третій лабораторній
+        for _ in range(18):
             next(csvreader)
         
         for row in csvreader:
@@ -35,25 +37,15 @@ with conn:
             average_score = (anxiety + depression + insomnia + ocd) / 4 
 
             cur.execute(
-                "SELECT 1 FROM Mental_Illness WHERE AverageScore = %s LIMIT 1",
-                (average_score,)
-            )
-            existing_record = cur.fetchone()
-
-            if existing_record:
-                # якщо вже існує людина з таким самим averagscore то ми пропускаємо її
-                continue
-
-            cur.execute(
-                "INSERT INTO Mental_Illness (Anxiety, Depression, Insomnia, OCD, AverageScore) VALUES (%s, %s, %s, %s, %s)",
-                (anxiety, depression, insomnia, ocd, average_score)
+                "INSERT INTO Mental_Illness (Anxiety, Depression, Insomnia, OCD, AverageScore, mental_illness_id) VALUES (%s, %s, %s, %s, %s, %s)",
+                (anxiety, depression, insomnia, ocd, average_score, current_mental_illness_id)
             )
 
             fav_genre = row['Fav genre']
             try:
                 bpm = int(row['BPM'])
             except (ValueError, TypeError):
-                bpm = 120 # якщо тими хто проходив опитування не зазначений BPM то поставимо їм BPM 120 тому що це середнє значення bpm у всій музиці
+                bpm = None # якщо тими хто проходив опитування не зазначений BPM то поставимо їм BPM 120 тому що це середнє значення bpm у всій музиці
             effects = row['Music effects']
 
             cur.execute(
@@ -65,15 +57,16 @@ with conn:
             try:
                 age = int(row['Age'])
             except (ValueError, TypeError):
-                age = 18 # якщо тими хто проходив опитування не зазначений вік то поставимо їм вік 18
+                age = None 
             hours_per_day = float(row['Hours per day'])
 
             cur.execute(
-                "INSERT INTO Person (person_id, age, hours_per_day, Music_id, AverageScore) VALUES (%s, %s, %s, %s, %s)",
-                (person_id, age, hours_per_day,current_music_id, average_score)
+                "INSERT INTO Person (person_id, age, hours_per_day, Music_id, mental_illness_id) VALUES (%s, %s, %s, %s, %s)",
+                (person_id, age, hours_per_day,current_music_id, current_mental_illness_id)
             )
 
             current_music_id += 1
+            current_mental_illness_id += 1
 
             if counter >= stop_at_row:
                 break
