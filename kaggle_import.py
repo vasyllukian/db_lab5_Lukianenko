@@ -32,7 +32,7 @@ with conn:
             depression = int(row['Depression'])
             insomnia = int(row['Insomnia'])
             ocd = int(row['OCD'])
-            average_score = 0.005 + (anxiety + depression + insomnia + ocd) / 4 
+            average_score = (anxiety + depression + insomnia + ocd) / 4 
 
             cur.execute(
                 "SELECT 1 FROM Mental_Illness WHERE AverageScore = %s LIMIT 1",
@@ -63,7 +63,7 @@ with conn:
 
             person_id = row['Timestamp']
             try:
-                age = int(row['BPM'])
+                age = int(row['Age'])
             except (ValueError, TypeError):
                 age = 18 # якщо тими хто проходив опитування не зазначений вік то поставимо їм вік 18
             hours_per_day = float(row['Hours per day'])
